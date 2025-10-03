@@ -1,0 +1,109 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+public class BinaryHeap<T extends Comparable<T>> {
+    private List<T> heap;
+    
+    // Вспомогательные методы для навигации по дереву
+    private int parent(int index) { return (index - 1) / 2; }
+    private int leftChild(int index) { return 2 * index + 1; }
+    private int rightChild(int index) { return 2 * index + 2; }
+    
+    // Просеивание вверх (для вставки)
+    private void heapifyUp(int index) {
+        // Пока не достигли корня и нарушено свойство кучи
+        while (index > 0 && heap.get(parent(index)).compareTo(heap.get(index)) > 0) {
+            swap(parent(index), index);
+            index = parent(index);
+        }
+    }
+    
+    // Просеивание вниз (для извлечения)
+    private void heapifyDown(int index) {
+        int minIndex = index;
+        int left = leftChild(index);
+        int right = rightChild(index);
+        
+        // Сравниваем с левым потомком
+        if (left < heap.size() && heap.get(left).compareTo(heap.get(minIndex)) < 0) {
+            minIndex = left;
+        }
+        
+        // Сравниваем с правым потомком
+        if (right < heap.size() && heap.get(right).compareTo(heap.get(minIndex)) < 0) {
+            minIndex = right;
+        }
+        
+        // Если нашли меньший элемент - меняем и продолжаем
+        if (index != minIndex) {
+            swap(index, minIndex);
+            heapifyDown(minIndex);
+        }
+    }
+    
+    // Вспомогательный метод для обмена элементов
+    private void swap(int i, int j) {
+        T temp = heap.get(i);
+        heap.set(i, heap.get(j));
+        heap.set(j, temp);
+    }
+    
+    // Конструкторы
+    public BinaryHeap() {
+        heap = new ArrayList<>();
+    }
+    
+    // Построение кучи из массива за O(n)
+    public BinaryHeap(List<T> array) {
+        heap = new ArrayList<>(array);
+        // Просеиваем все элементы, начиная с середины
+        for (int i = (heap.size() / 2) - 1; i >= 0; --i) {
+            heapifyDown(i);
+        }
+    }
+    
+    // Вставка элемента
+    public void insert(T value) {
+        heap.add(value);              // Добавляем в конец
+        heapifyUp(heap.size() - 1);   // Просеиваем вверх
+    }
+    
+    // Извлечение минимального элемента
+    public T extractMin() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("Heap is empty");
+        }
+        
+        T minValue = heap.get(0);     // Сохраняем минимальный элемент
+        heap.set(0, heap.get(heap.size() - 1));  // Последний элемент ставим в корень
+        heap.remove(heap.size() - 1); // Удаляем последний элемент
+        
+        if (!isEmpty()) {
+            heapifyDown(0);           // Просеиваем вниз
+        }
+        
+        return minValue;
+    }
+    
+    // Получение минимального элемента без извлечения
+    public T getMin() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("Heap is empty");
+        }
+        return heap.get(0);
+    }
+    
+    // Проверка на пустоту
+    public boolean isEmpty() {
+        return heap.isEmpty();
+    }
+    
+    // Размер кучи
+    public int size() {
+        return heap.size();
+    }
+    
+    // Вывод кучи (для отладки)
+    public void print() {
+        System.out.print("Heap
