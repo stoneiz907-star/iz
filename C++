@@ -1,0 +1,42 @@
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+
+template<typename T>
+class BinaryHeap {
+private:
+    std::vector<T> heap;
+    
+    // Вспомогательные методы для навигации по дереву
+    int parent(int index) const { return (index - 1) / 2; }
+    int leftChild(int index) const { return 2 * index + 1; }
+    int rightChild(int index) const { return 2 * index + 2; }
+    
+    // Просеивание вверх (для вставки)
+    void heapifyUp(int index) {
+        // Пока не достигли корня и нарушено свойство кучи
+        while (index > 0 && heap[parent(index)] > heap[index]) {
+            std::swap(heap[parent(index)], heap[index]);
+            index = parent(index);
+        }
+    }
+    
+    // Просеивание вниз (для извлечения)
+    void heapifyDown(int index) {
+        int minIndex = index;
+        int left = leftChild(index);
+        int right = rightChild(index);
+        
+        // Сравниваем с левым потомком
+        if (left < heap.size() && heap[left] < heap[minIndex]) {
+            minIndex = left;
+        }
+        
+        // Сравниваем с правым потомком
+        if (right < heap.size() && heap[right] < heap[minIndex]) {
+            minIndex = right;
+        }
+        
+        // Если нашли меньший элемент - меняем и продолжаем
+        if (index != minIndex) {
+            std::swap(heap[index], heap
